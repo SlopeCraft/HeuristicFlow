@@ -139,7 +139,7 @@ struct __impl_isContinousBox {
     return 0;
   }
 
-  static void fun(...) { return; }
+  static void fun(...) { }
 
  public:
   static constexpr bool value = std::is_same_v<int, decltype(fun(Box()))>;
@@ -222,11 +222,11 @@ concept isPSOBox = requires(Box b, int d, typename Box::Var_t v) {
 
 namespace internal {
 
-template <int _ObjNum>
+template <int _objNum>
 struct heu_initializeSize {
  public:
   template <typename A>
-  inline static void resize(A* v, size_t sz) noexcept {
+  inline static void resize([[maybe_unused]] A* v, [[maybe_unused]] size_t sz) noexcept {
     assert(v->size() == sz);
   }
 };
@@ -271,7 +271,7 @@ struct isEigenClass {
  private:
   struct isEigen_t {};
 
-  static bool fun(...) { return 0; }
+  static bool fun(...) { return false; }
 
   template <class U>
   static decltype(U()(0), U()(0, 0), U().rows(), U().cols(), U().array(), U().setZero(),

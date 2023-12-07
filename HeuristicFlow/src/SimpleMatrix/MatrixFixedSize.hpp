@@ -20,8 +20,8 @@ This file is part of Heuristic.
 #ifndef Heu_MATRIXFIXEDSIZE_H
 #define Heu_MATRIXFIXEDSIZE_H
 
-#include <stdint.h>
-#include <assert.h>
+#include <cstdint>
+#include <cassert>
 #include <array>
 
 #include "InternalHeaderCheck.h"
@@ -71,7 +71,7 @@ class MatrixFixedSize : public MatrixBase<MatrixFixedSize<Scalar, Rows, Cols>> {
    *
    * \param src Source of copying
    */
-  explicit MatrixFixedSize(const MatrixFixedSize &src) {
+  MatrixFixedSize(const MatrixFixedSize &src) {
     if constexpr (!std::is_trivially_copy_assignable_v<Scalar_t>) {
       for (size_t i = 0; i < size(); i++) {
         array[i] = src.array[i];
@@ -89,11 +89,11 @@ class MatrixFixedSize : public MatrixBase<MatrixFixedSize<Scalar, Rows, Cols>> {
 
   inline citerator end() const noexcept { return array.data() + size(); }
 
-  constexpr size_t size() const noexcept { return Rows * Cols; }
+  [[nodiscard]] constexpr size_t size() const noexcept { return Rows * Cols; }
 
-  constexpr size_t rows() const noexcept { return Rows; }
+  [[nodiscard]] constexpr size_t rows() const noexcept { return Rows; }
 
-  constexpr size_t cols() const noexcept { return Cols; }
+  [[nodiscard]] constexpr size_t cols() const noexcept { return Cols; }
 
   inline const Scalar_t &operator()(size_t n) const noexcept { return array[n]; }
 
@@ -113,7 +113,7 @@ class MatrixFixedSize : public MatrixBase<MatrixFixedSize<Scalar, Rows, Cols>> {
 
   inline const Scalar_t *data() const noexcept { return array.data(); }
 
-  inline static void resize(size_t _r, size_t _c) noexcept {
+  inline static void resize([[maybe_unused]] size_t _r, [[maybe_unused]] size_t _c) noexcept {
     assert(_r == Rows);
     assert(_c == Cols);
   }
@@ -148,4 +148,4 @@ class MatrixFixedSize : public MatrixBase<MatrixFixedSize<Scalar, Rows, Cols>> {
 };
 }  // namespace heu
 
-#endif  // MATRIXFIXEDSIZE_H
+#endif  // Heu_MATRIXFIXEDSIZE_H

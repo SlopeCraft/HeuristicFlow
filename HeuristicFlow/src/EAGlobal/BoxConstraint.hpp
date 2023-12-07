@@ -80,7 +80,7 @@ class BoxBase {
   }
 
  protected:
-  inline void assert4Size(const int idx) const noexcept {
+  inline void assert4Size([[maybe_unused]] const int idx) const noexcept {
     assert(idx >= 0 && idx < static_cast<const Derived*>(this)->dimensions());
   }
 };
@@ -91,7 +91,7 @@ template <class Derived, class Var_t>
 class MatBoxBase {
  public:
  protected:
-  inline void assert4Size(const int r, const int c) const noexcept {
+  inline void assert4Size([[maybe_unused]] const int r, [[maybe_unused]] const int c) const noexcept {
     assert(r >= 0 && r < static_cast<const Derived*>(this)->boxRows());
     assert(c >= 0 && c < static_cast<const Derived*>(this)->boxCols());
   }
