@@ -23,9 +23,9 @@ This file is part of HeuristicFlow.
 #include "InternalHeaderCheck.h"
 #include "MOGABase.hpp"
 
-namespace heu {
 
-namespace internal {
+
+namespace heu::internal {
 
 /**
  * \ingroup HEU_GENETIC
@@ -109,7 +109,7 @@ class NSGABase
 #pragma omp parallel for schedule(dynamic, popSizeBefore / thN)
     for (int ed = 0; ed < popSizeBefore; ed++) {
       sortSpace[ed]->dominated_by_num = 0;
-      for (size_t er = 0; er < popSizeBefore; er++) {
+      for (int er = 0; er < int(popSizeBefore); er++) {
         if (er == ed) continue;
         sortSpace[ed]->dominated_by_num += Pareto<ObjNum, fOpt>::isStrongDominate(
             &(sortSpace[er]->fitness), &(sortSpace[ed]->fitness));
@@ -176,8 +176,8 @@ class NSGABase
   HEU_MAKE_GABASE_TYPES(Base_t)         \
   using Fitness_t = typename Base_t::Fitness_t;
 
-}  //  namespace internal
+} // namespace heu::internal
 
-}  //  namespace heu
+
 
 #endif  //  HEU_NSGABASE_HPP
