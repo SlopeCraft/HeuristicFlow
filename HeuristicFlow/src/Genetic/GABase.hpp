@@ -213,7 +213,6 @@ class GABase : public GAAbstract<Var_t, Fitness_t, Args_t>,
   void __impl_computeAllFitness() noexcept {
 #ifdef HEU_HAS_OPENMP
     std::vector<Gene *> tasks;
-    tasks.resize(0);
     tasks.reserve(_population.size());
     for (Gene &i : _population) {
       if (i.is_fitness_computed) {
