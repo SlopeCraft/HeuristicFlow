@@ -28,8 +28,8 @@ This file is part of HeuristicFlow.
 
 #include <iostream>
 
-namespace heu {
-namespace internal {
+
+namespace heu::internal {
 
 template <typename Var_t, class Fitness_t, class Arg_t = void>
 struct MOFunctions12 {
@@ -44,7 +44,7 @@ struct MOFunctions12<Var_t, Fitness_t, void> {
   static_assert(sizeMayMatch<Fitness_t, 2>::value,
                 "MOFunctions12 requires Fitness_t to be a 2-d array");
 
-  static inline void assert4Size(const Var_t *x) noexcept {
+  static inline void assert4Size([[maybe_unused]] const Var_t *x) noexcept {
     if constexpr (!array_traits<Var_t>::isFixedSize) {
       assert(x->size() == 1);
     }
@@ -101,7 +101,7 @@ struct MOFunctions22<Var_t, Fitness_t, void> {
  private:
   static_assert((!array_traits<Var_t>::isFixedSize) || (array_traits<Var_t>::sizeCT == 2));
   static_assert((!array_traits<Fitness_t>::isFixedSize) || (array_traits<Fitness_t>::sizeCT == 2));
-  static inline void assert4Size(const Var_t *_x) noexcept {
+  static inline void assert4Size([[maybe_unused]] const Var_t *_x) noexcept {
     if constexpr (!array_traits<Var_t>::isFixedSize) {
       assert(_x->size() == 2);
     }
@@ -183,7 +183,7 @@ struct MOFunctions23<Var_t, Fitness_t, void> {
  private:
   static_assert((!array_traits<Var_t>::isFixedSize) || (array_traits<Var_t>::sizeCT == 2));
   static_assert((!array_traits<Fitness_t>::isFixedSize) || (array_traits<Fitness_t>::sizeCT == 3));
-  static inline void assert4Size(const Var_t *_x) noexcept {
+  static inline void assert4Size([[maybe_unused]] const Var_t *_x) noexcept {
     if constexpr (!array_traits<Var_t>::isFixedSize) {
       assert(_x->size() == 2);
     }
@@ -225,7 +225,7 @@ struct MOFunctionsX2<Var_t, Fitness_t, void> {
   static_assert((!array_traits<Fitness_t>::isFixedSize) || (array_traits<Fitness_t>::sizeCT == 2));
   static_assert((!array_traits<Var_t>::isFixedSize) || (array_traits<Fitness_t>::sizeCT >= 1));
 
-  static inline void assert4Size(const Fitness_t *f) noexcept {
+  static inline void assert4Size([[maybe_unused]] const Fitness_t *f) noexcept {
     if constexpr (!array_traits<Fitness_t>::isFixedSize) {
       assert(f->size() == 2);
     }
@@ -319,8 +319,7 @@ struct sizeMayMatchDTLZ1to7 {
   static_assert((!array_traits<Fitness_t>::isFixedSize) || (array_traits<Fitness_t>::sizeCT));
 
   static constexpr bool value =
-      (isAllFixed) ? (array_traits<Var_t>::sizeCT - array_traits<Fitness_t>::sizeCT + 1 > 0)
-                   : (true);
+      !(isAllFixed) || (array_traits<Var_t>::sizeCT - array_traits<Fitness_t>::sizeCT + 1 > 0);
 };
 
 template <typename Var_t, class Fitness_t>
@@ -330,7 +329,7 @@ struct sizeMayMatchDTLZ89 {
   static_assert((!array_traits<Fitness_t>::isFixedSize) || (array_traits<Fitness_t>::sizeCT));
 
   static constexpr bool value =
-      (isAllFixed) ? (array_traits<Var_t>::sizeCT > array_traits<Fitness_t>::sizeCT) : (true);
+      !(isAllFixed) || (array_traits<Var_t>::sizeCT > array_traits<Fitness_t>::sizeCT);
 };
 
 template <typename Var_t, class Fitness_t>
@@ -348,7 +347,7 @@ struct DTLZ1to7<Var_t, Fitness_t, void> {
     } else {
       const int N = int(_x->size());
       const int M = int(f->size());
-      const bool DTLZ1_to_DTLZ7_problems_require__N_minus_M_plus_1__to_be_positive = N - M + 1 > 0;
+      [[maybe_unused]] const bool DTLZ1_to_DTLZ7_problems_require__N_minus_M_plus_1__to_be_positive = N - M + 1 > 0;
       assert(DTLZ1_to_DTLZ7_problems_require__N_minus_M_plus_1__to_be_positive);
     }
   }
@@ -393,7 +392,7 @@ struct DTLZ1to7<Var_t, Fitness_t, void> {
   inline static void DTLZ1(const Var_t *x, Fitness_t *f) noexcept {
     assert4Size(x, f);
 
-    scalar_t g = 0;
+    [[maybe_unused]] scalar_t g = 0;
     const int N = int(x->size());
     const int M = int(f->size());
     if constexpr (array_traits<Var_t>::isEigenClass) {
@@ -455,7 +454,7 @@ struct DTLZ1to7<Var_t, Fitness_t, void> {
     const int N = int(x->size());
     const int M = int(f->size());
 
-    scalar_t g = 0;
+    [[maybe_unused]] scalar_t g = 0;
 
     if constexpr (array_traits<Var_t>::isEigenClass) {
       auto xm = computeXM(x, f);
@@ -697,7 +696,7 @@ struct DTLZ89<Var_t, Fitness_t, void> {
     } else {
       const int N = int(_x->size());
       const int M = int(f->size());
-      const bool
+      [[maybe_unused]] const bool
           DTLZ8_and_DTLZ9_require_the_dimensions_of_determine_variable_to_be_greater_than_the_number_of_objectives =
               N > M;
 
@@ -870,6 +869,6 @@ struct DTLZ89<Var_t, Fitness_t, void> {
   }
 };
 
-}  // namespace internal
-}  // namespace heu
+} // namespace heu::internal
+
 #endif  // HEU_MOFUNCTIONS_HPP

@@ -80,7 +80,7 @@ class BoxBase {
   }
 
  protected:
-  inline void assert4Size(const int idx) const noexcept {
+  inline void assert4Size([[maybe_unused]] const int idx) const noexcept {
     assert(idx >= 0 && idx < static_cast<const Derived*>(this)->dimensions());
   }
 };
@@ -91,7 +91,7 @@ template <class Derived, class Var_t>
 class MatBoxBase {
  public:
  protected:
-  inline void assert4Size(const int r, const int c) const noexcept {
+  inline void assert4Size([[maybe_unused]] const int r, [[maybe_unused]] const int c) const noexcept {
     assert(r >= 0 && r < static_cast<const Derived*>(this)->boxRows());
     assert(c >= 0 && c < static_cast<const Derived*>(this)->boxCols());
   }
@@ -104,13 +104,13 @@ class SquareBoxCore {
  public:
   using Scalar_t = typename array_traits<Var_t>::Scalar_t;
 
-  inline Scalar_t& min() noexcept { return _minS; }
-  inline Scalar_t min() const noexcept { return _minS; }
-  inline Scalar_t min(const int) const noexcept { return _minS; }
+  [[nodiscard]] inline Scalar_t& min() noexcept { return _minS; }
+  [[nodiscard]] inline Scalar_t min() const noexcept { return _minS; }
+  [[nodiscard]] inline Scalar_t min(const int) const noexcept { return _minS; }
 
-  inline Scalar_t& max() noexcept { return _maxS; }
-  inline Scalar_t max() const noexcept { return _maxS; }
-  inline Scalar_t max(const int) const noexcept { return _maxS; }
+  [[nodiscard]]  inline Scalar_t& max() noexcept { return _maxS; }
+  [[nodiscard]] inline Scalar_t max() const noexcept { return _maxS; }
+  [[nodiscard]] inline Scalar_t max(const int) const noexcept { return _maxS; }
 
   inline void setRange(const Scalar_t _min_, const Scalar_t _max_) noexcept {
     assert(_min_ < _max_);
@@ -129,11 +129,11 @@ class BooleanBoxCore {
   static_assert(std::is_same_v<typename array_traits<Var_t>::Scalar_t, bool>);
   using Scalar_t = bool;
 
-  inline constexpr bool min() const noexcept { return 0; }
-  inline constexpr bool min(const int) const noexcept { return 0; }
+  [[nodiscard]] constexpr bool min() const noexcept { return 0; }
+  [[nodiscard]] constexpr bool min(const int) const noexcept { return 0; }
 
-  inline constexpr bool max() const noexcept { return 1; }
-  inline constexpr bool max(const int) const noexcept { return 1; }
+  [[nodiscard]] constexpr bool max() const noexcept { return 1; }
+  [[nodiscard]] constexpr bool max(const int) const noexcept { return 1; }
 };
 
 ////////////////////////////
@@ -199,11 +199,11 @@ class SquareBoxDynamicDimMat
   static_assert(!array_traits<Var_t>::isFixedSize);
   static_assert(!array_traits<Var_t>::isVector);
 
-  inline int dimensions() const noexcept { return _rows * _cols; }
+  [[nodiscard]] inline int dimensions() const noexcept { return _rows * _cols; }
 
-  inline int boxRows() const noexcept { return _rows; }
+  [[nodiscard]] inline int boxRows() const noexcept { return _rows; }
 
-  inline int boxCols() const noexcept { return _cols; }
+  [[nodiscard]] inline int boxCols() const noexcept { return _cols; }
 
   inline void setDimensions(const int rows, const int cols) noexcept {
     assert(rows > 0);
@@ -268,7 +268,7 @@ class NonSquareBoxConstDimVec : public BoxBase<NonSquareBoxConstDimVec<Var>, Var
   static_assert(array_traits<Var_t>::isFixedSize);
   static_assert(array_traits<Var_t>::isVector);
 
-  inline constexpr int dimensions() const noexcept { return array_traits<Var_t>::sizeCT; }
+  constexpr int dimensions() const noexcept { return array_traits<Var_t>::sizeCT; }
 
   inline void initializeSize(Var_t*) const noexcept {}
 };
@@ -285,13 +285,13 @@ class NonSquareBoxConstDimMat : public BoxBase<NonSquareBoxConstDimMat<Var>, Var
   static_assert(array_traits<Var_t>::isFixedSize);
   static_assert(!array_traits<Var_t>::isVector);
 
-  inline constexpr int dimensions() const noexcept { return array_traits<Var_t>::sizeCT; }
+  [[nodiscard]] constexpr int dimensions() const noexcept { return array_traits<Var_t>::sizeCT; }
 
-  inline constexpr int boxRows() const noexcept { return array_traits<Var_t>::rowsCT; }
+  [[nodiscard]] constexpr int boxRows() const noexcept { return array_traits<Var_t>::rowsCT; }
 
-  inline constexpr int boxCols() const noexcept { return array_traits<Var_t>::colsCT; }
+  [[nodiscard]] constexpr int boxCols() const noexcept { return array_traits<Var_t>::colsCT; }
 
-  inline void initializeSize(Var_t* v) const noexcept {}
+  inline void initializeSize(Var_t* ) const noexcept {}
 };
 
 template <class Var>
@@ -303,7 +303,7 @@ class NonSquareBoxDynamicDimVec : public BoxBase<NonSquareBoxDynamicDimVec<Var>,
   static_assert(!array_traits<Var_t>::isFixedSize);
   static_assert(array_traits<Var_t>::isVector);
 
-  inline int dimensions() const noexcept {
+  [[nodiscard]] inline int dimensions() const noexcept {
     assert(this->min().size() == this->max().size());
     return int(this->min().size());
   }
@@ -328,18 +328,18 @@ class NonSquareBoxDynamicDimMat : public BoxBase<NonSquareBoxDynamicDimMat<Var>,
   static_assert(!array_traits<Var_t>::isFixedSize);
   static_assert(!array_traits<Var_t>::isVector);
 
-  inline int dimensions() const noexcept {
+  [[nodiscard]] inline int dimensions() const noexcept {
     assert(this->min().size() == this->max().size());
     assert(this->min().rows() == this->max().rows());
     return int(this->min().size());
   }
 
-  inline int boxRows() const noexcept {
+  [[nodiscard]] inline int boxRows() const noexcept {
     assert(this->min().rows() == this->max().rows());
     return int(this->min().rows());
   }
 
-  inline int boxCols() const noexcept {
+  [[nodiscard]] inline int boxCols() const noexcept {
     assert(this->min().cols() == this->max().cols());
     return int(this->min().cols());
   }
@@ -475,9 +475,9 @@ class FixedDiscreteBox
   static_assert(!std::is_floating_point_v<Scalar_t>);
 #endif
 
-  inline constexpr Scalar_t min(const int = 0) const noexcept { return _minCT; }
+  [[nodiscard]] constexpr Scalar_t min(const int = 0) const noexcept { return _minCT; }
 
-  inline constexpr Scalar_t max(const int = 0) const noexcept { return _maxCT; }
+  [[nodiscard]] constexpr Scalar_t max(const int = 0) const noexcept { return _maxCT; }
 };
 
 template <class Var, ::heu::binCode_t<typename array_traits<Var>::Scalar_t> _minCode,
@@ -497,9 +497,9 @@ class FixedDiscreteBox17
 
   static_assert(std::is_floating_point_v<Scalar_t>);
 
-  inline constexpr Scalar_t min(const int = 0) const noexcept { return _minCT; }
+  [[nodiscard]] constexpr Scalar_t min(const int = 0) const noexcept { return _minCT; }
 
-  inline constexpr Scalar_t max(const int = 0) const noexcept { return _maxCT; }
+  [[nodiscard]] constexpr Scalar_t max(const int = 0) const noexcept { return _maxCT; }
 };
 
 //////////////////////////////////
@@ -511,15 +511,15 @@ class SquareBoxDeltaCore {
   using Scalar_t = typename array_traits<Var_t>::Scalar_t;
   static_assert(std::is_floating_point_v<Scalar_t>);
 
-  inline Scalar_t& delta() noexcept { return _deltaS; }
+  [[nodiscard]] inline Scalar_t& delta() noexcept { return _deltaS; }
 
-  inline Scalar_t delta() const noexcept { return _deltaS; }
+  [[nodiscard]] inline Scalar_t delta() const noexcept { return _deltaS; }
 
-  inline Scalar_t delta(const int idx) const noexcept { return _deltaS; }
+  [[nodiscard]] inline Scalar_t delta([[maybe_unused]]const int idx) const noexcept { return _deltaS; }
 
-  inline void setDelta(const Scalar_t __delta) noexcept {
-    assert(__delta > 0);
-    _deltaS = __delta;
+  inline void setDelta(const Scalar_t delta_) noexcept {
+    assert(delta_ > 0);
+    _deltaS = delta_;
   }
 
  private:
@@ -532,17 +532,17 @@ class NonSquareBoxDeltaCore {
   using Scalar_t = typename array_traits<Var_t>::Scalar_t;
   static_assert(std::is_floating_point_v<Scalar_t>);
 
-  inline Var_t& delta() noexcept { return _deltaV; }
+  [[nodiscard]] inline Var_t& delta() noexcept { return _deltaV; }
 
-  inline const Var_t& delta() const noexcept { return _deltaV; }
+  [[nodiscard]] inline const Var_t& delta() const noexcept { return _deltaV; }
 
-  inline Scalar_t delta(const int idx) const noexcept { return at(_deltaV, idx); }
+  [[nodiscard]] inline Scalar_t delta(const int idx) const noexcept { return at(_deltaV, idx); }
 
-  inline void setDelta(const Var_t& __delta) noexcept {
-    for (Scalar_t deltaElement : __delta) {
+  inline void setDelta(const Var_t& delta_) noexcept {
+    for (Scalar_t deltaElement : delta_) {
       assert(deltaElement > 0);
     }
-    _deltaV = __delta;
+    _deltaV = delta_;
   }
 
  private:
@@ -644,7 +644,7 @@ class FixedContinousBox20 : public FixedDiscreteBox<Var, _minCT, _maxCT> {
   static_assert(_deltaCT > 0);
   using Var_t = Var;
   using Scalar_t = typename array_traits<Var>::Scalar_t;
-  inline constexpr Scalar_t delta(const int = 0) const noexcept { return _deltaCT; }
+  constexpr Scalar_t delta(const int = 0) const noexcept { return _deltaCT; }
 };
 
 #endif
@@ -660,7 +660,7 @@ class FixedContinousBox17 : public FixedDiscreteBox17<Var, _minCode, _maxCode> {
   static constexpr Scalar_t _deltaCT = decode(_deltaCode);
   static_assert(_deltaCT > 0);
 
-  inline constexpr Scalar_t delta(const int = 0) const noexcept { return _deltaCT; }
+  constexpr Scalar_t delta(const int = 0) const noexcept { return _deltaCT; }
 };
 
 namespace {
@@ -671,18 +671,18 @@ class GuassianBoxCore : public SquareBoxDeltaCore<Var_t> {
   static_assert(std::is_floating_point_v<Scalar_t>,
                 "Infinite box requries that type of element must be floating point numbers");
 
-  inline constexpr Scalar_t min() const { return -std::numeric_limits<Scalar_t>::infinity(); }
-  inline constexpr Scalar_t min(const int) const {
+  constexpr Scalar_t min() const { return -std::numeric_limits<Scalar_t>::infinity(); }
+  constexpr Scalar_t min(const int) const {
     return -std::numeric_limits<Scalar_t>::infinity();
   }
-  inline constexpr Scalar_t min(const int, const int) const {
+  constexpr Scalar_t min(const int, const int) const {
     return -std::numeric_limits<Scalar_t>::infinity();
   }
-  inline constexpr Scalar_t max() const { return std::numeric_limits<Scalar_t>::infinity(); }
-  inline constexpr Scalar_t max(const int) const {
+  constexpr Scalar_t max() const { return std::numeric_limits<Scalar_t>::infinity(); }
+  constexpr Scalar_t max(const int) const {
     return std::numeric_limits<Scalar_t>::infinity();
   }
-  inline constexpr Scalar_t max(const int, const int) const {
+  constexpr Scalar_t max(const int, const int) const {
     return std::numeric_limits<Scalar_t>::infinity();
   }
 

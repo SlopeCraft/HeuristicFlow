@@ -26,8 +26,8 @@ This file is part of HeuristicFlow.
 
 #include "InternalHeaderCheck.h"
 
-namespace heu {
-namespace internal {
+
+namespace heu::internal {
 
 template <typename Var_t, class Fitness_t = double, class Arg_t = void>
 struct SOFunctions2 {
@@ -55,7 +55,7 @@ struct SOFunctions2<Var_t, Fitness_t, void> {
                 "Fitness_t must be a floating point number");
   static_assert((!array_traits<Var_t>::isFixedSize) || (array_traits<Var_t>::sizeCT == 2),
                 "2 testing functions require a 2-d array");
-  inline static void assert4Size(const Var_t *_x) noexcept {
+  inline static void assert4Size([[maybe_unused]] const Var_t *_x) noexcept {
     if constexpr (!array_traits<Var_t>::isFixedSize) {
       assert(_x->size() == 2);
     }
@@ -265,7 +265,7 @@ struct SOFunctionsX<Var_t, Fitness_t, void> {
   }
 };
 
-}  // namespace internal
-}  // namespace heu
+} // namespace heu::internal
+
 
 #endif  //  HEU_SOFUNCTIONS_HPP

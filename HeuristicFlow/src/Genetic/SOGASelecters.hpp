@@ -83,7 +83,7 @@ class SOGASelector<SelectMethod::RouletteWheel> {
   friend class SOGAInheriter<SelectMethod::RouletteWheel>;
 
  public:
-  inline constexpr SelectMethod selectMethod() const noexcept {
+  [[nodiscard]] constexpr SelectMethod selectMethod() const noexcept {
     return SelectMethod::RouletteWheel;
   }
 
@@ -182,16 +182,16 @@ class SOGASelector<SelectMethod::Tournament> {
   friend class SOGAInheriter<SelectMethod::Tournament>;
 
  public:
-  inline constexpr SelectMethod selectMethod() const noexcept { return SelectMethod::Tournament; }
+  [[nodiscard]] constexpr SelectMethod selectMethod() const noexcept { return SelectMethod::Tournament; }
 
  public:
   SOGASelector() { _tournamentSize = 3; }
 
-  inline int& tournamentSize() noexcept { return _tournamentSize; }
-  inline int tournamentSize() const noexcept { return _tournamentSize; };
+  [[nodiscard]]  inline int& tournamentSize() noexcept { return _tournamentSize; }
+  [[nodiscard]] inline int tournamentSize() const noexcept { return _tournamentSize; };
 
   inline void setTournamentSize(int TS) noexcept {
-    const bool tournament_size_should_be_greater_than_or_euqal_to_2 = TS >= 2;
+    [[maybe_unused]] const bool tournament_size_should_be_greater_than_or_euqal_to_2 = TS >= 2;
     assert(tournament_size_should_be_greater_than_or_euqal_to_2);
     _tournamentSize = TS;
   }
@@ -207,7 +207,7 @@ class SOGASelector<SelectMethod::Tournament> {
     ;
 
     {
-      const bool tournament_size_should_be_less_than_the_population_size =
+      [[maybe_unused]] const bool tournament_size_should_be_less_than_the_population_size =
           _tournamentSize < int(static_cast<this_t*>(this)->_option.populationSize);
       assert(tournament_size_should_be_less_than_the_population_size);
     }
@@ -301,7 +301,7 @@ class SOGASelector<SelectMethod::MonteCarlo> {
   friend class SOGAInheriter<SelectMethod::MonteCarlo>;
 
  public:
-  inline constexpr SelectMethod selectMethod() const noexcept { return SelectMethod::MonteCarlo; }
+  constexpr SelectMethod selectMethod() const noexcept { return SelectMethod::MonteCarlo; }
 
  protected:
   template <class this_t>
@@ -344,7 +344,7 @@ class SOGASelector<SelectMethod::Probability> {
   friend class SOGAInheriter<SelectMethod::Probability>;
 
  public:
-  inline constexpr SelectMethod selectMethod() const noexcept { return SelectMethod::Probability; }
+  constexpr SelectMethod selectMethod() const noexcept { return SelectMethod::Probability; }
 
  protected:
   template <class this_t>
@@ -450,27 +450,27 @@ class SOGASelector<SelectMethod::LinearRank> {
     _linearSelectWrostProbability = 0.1;
   }
 
-  inline constexpr SelectMethod selectMethod() const noexcept { return SelectMethod::LinearRank; }
+  [[nodiscard]] constexpr SelectMethod selectMethod() const noexcept { return SelectMethod::LinearRank; }
 
-  inline double linearSelectBestProbability() const noexcept {
+  [[nodiscard]] inline double linearSelectBestProbability() const noexcept {
     return _linearSelectBestProbability;
   }
 
-  inline double linearSelectWrostProbability() const noexcept {
+  [[nodiscard]] inline double linearSelectWrostProbability() const noexcept {
     return _linearSelectWrostProbability;
   }
 
   inline void setLinearSelectProbability(double worstProbabilty, double bestProbability) noexcept {
-    const bool worst_gene_select_probability_should_be_less_than_the_best_gene_select_probability =
+    [[maybe_unused]] const bool worst_gene_select_probability_should_be_less_than_the_best_gene_select_probability =
         worstProbabilty < bestProbability;
     assert(worst_gene_select_probability_should_be_less_than_the_best_gene_select_probability);
 
-    const bool probability_should_be_greater_or_equal_to_0 =
+    [[maybe_unused]] const bool probability_should_be_greater_or_equal_to_0 =
         worstProbabilty >= 0 && bestProbability >= 0;
 
     assert(probability_should_be_greater_or_equal_to_0);
 
-    const bool probability_should_be_less_or_equal_to_1 =
+    [[maybe_unused]] const bool probability_should_be_less_or_equal_to_1 =
         worstProbabilty <= 1 && bestProbability <= 1;
     assert(probability_should_be_less_or_equal_to_1);
 
@@ -521,7 +521,7 @@ class SOGASelector<SelectMethod::LinearRank> {
     }
 
     double rMax = 1.0;
-    while (int(eliminateSpace.size()) > popSizeBeforeSelect - K) {
+    while (int(eliminateSpace.size()) > (popSizeBeforeSelect - K)) {
       double r = randD(0, rMax);
       for (auto it = eliminateSpace.begin(); it != eliminateSpace.end(); ++it) {
         r -= it->second;
@@ -552,18 +552,18 @@ class SOGASelector<SelectMethod::ExponentialRank> {
  public:
   SOGASelector() { _exponetialSelectBase = 0.8; }
 
-  inline constexpr SelectMethod selectMethod() const noexcept {
+  [[nodiscard]] constexpr SelectMethod selectMethod() const noexcept {
     return SelectMethod::ExponentialRank;
   }
 
-  inline double exponetialSelectBase() const noexcept { return _exponetialSelectBase; }
+  [[nodiscard]] inline double exponetialSelectBase() const noexcept { return _exponetialSelectBase; }
 
   inline void setExponetialSelectBase(double _c) noexcept {
-    const bool the_base_number_for_exponential_rank_selection_should_be_greater_or_equal_to_0 =
+    [[maybe_unused]] const bool the_base_number_for_exponential_rank_selection_should_be_greater_or_equal_to_0 =
         _c >= 0;
     assert(the_base_number_for_exponential_rank_selection_should_be_greater_or_equal_to_0);
 
-    const bool the_base_number_for_exponential_rank_selection_should_be_less_than_1 = _c < 1;
+    [[maybe_unused]]  const bool the_base_number_for_exponential_rank_selection_should_be_less_than_1 = _c < 1;
     assert(the_base_number_for_exponential_rank_selection_should_be_less_than_1);
 
     _exponetialSelectBase = _c;
@@ -639,9 +639,9 @@ class SOGASelector<SelectMethod::Boltzmann> {
   friend class SOGAInheriter<SelectMethod::Boltzmann>;
 
  public:
-  inline constexpr SelectMethod selectMethod() const noexcept { return SelectMethod::Boltzmann; }
+  [[nodiscard]] constexpr SelectMethod selectMethod() const noexcept { return SelectMethod::Boltzmann; }
 
-  inline double boltzmannSelectStrength() noexcept { return _boltzmannSelectStrength; }
+  [[nodiscard]] inline double boltzmannSelectStrength() noexcept { return _boltzmannSelectStrength; }
 
   inline void setBoltzmannSelectStrength(double b) noexcept { _boltzmannSelectStrength = b; }
 
@@ -813,11 +813,11 @@ class SOGASelector<SelectMethod::EliteReserved> {
  public:
   SOGASelector() { _eliteNum = 1; }
 
-  inline constexpr SelectMethod selectMethod() const noexcept {
+  [[nodiscard]] constexpr SelectMethod selectMethod() const noexcept {
     return SelectMethod::EliteReserved;
   }
 
-  inline int eliteNum() const noexcept { return _eliteNum; }
+  [[nodiscard]] inline int eliteNum() const noexcept { return _eliteNum; }
 
   inline void setEliteNum(int eliteNum) noexcept {
     assert(eliteNum >= 1);
@@ -939,7 +939,7 @@ class SOGASelector<SelectMethod::RunTimeSelectMethod>
  public:
   SOGASelector() { _selectMethod = SelectMethod::EliteReserved; }
   using someType = SOGAInheriter<SelectMethod(0)>;
-  inline SelectMethod selectMethod() const noexcept { return _selectMethod; }
+  [[nodiscard]] inline SelectMethod selectMethod() const noexcept { return _selectMethod; }
 
   inline void setSelectMethod(SelectMethod _sm) noexcept {
     switch (_sm) {
@@ -956,7 +956,7 @@ class SOGASelector<SelectMethod::RunTimeSelectMethod>
         _selectMethod = _sm;
         break;
       default:
-        const bool invalid_select_method = false;
+        [[maybe_unused]] const bool invalid_select_method = false;
         assert(invalid_select_method);
         break;
     }
