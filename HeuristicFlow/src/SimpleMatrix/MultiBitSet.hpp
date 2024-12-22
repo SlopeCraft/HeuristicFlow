@@ -2,7 +2,7 @@
 #ifndef HEU_MULTIBITSET_HPP
 #define HEU_MULTIBITSET_HPP
 
-#include <stdint.h>
+#include <cstdint>
 #include <type_traits>
 #include <memory>
 #include <cmath>
@@ -84,7 +84,7 @@ class multiBitSet {
      * \return true If the reference is valid
      * \return false If the reference is invalid
      */
-    inline bool isNull() const noexcept {
+    [[nodiscard]] inline bool isNull() const noexcept {
       return (source == nullptr) || (index < 0) || (index >= source->size());
     }
 
@@ -192,9 +192,9 @@ class multiBitSet {
 
     inline it_t operator[](int64_t idx) const noexcept { return *this + idx; }
 
-    inline size_t index() const noexcept { return static_cast<const it_t*>(this)->ref.index; }
+    [[nodiscard]] inline size_t index() const noexcept { return static_cast<const it_t*>(this)->ref.index; }
 
-    inline bool isNull() const noexcept { return static_cast<const it_t*>(this)->ref.isNull(); }
+    [[nodiscard]] inline bool isNull() const noexcept { return static_cast<const it_t*>(this)->ref.isNull(); }
 
    protected:
     inline bool isSame(const reference_t& anotherRef) const noexcept {
@@ -288,7 +288,7 @@ class multiBitSet {
      * \brief Construct a new constIterator_t object from non-const iterator
      *
      */
-    constIterator_t(const iterator_t& parent) {
+    explicit constIterator_t(const iterator_t& parent) {
       this->ref.index = parent.ref.index;
       this->ref.source = parent.ref.source;
     }
@@ -341,28 +341,28 @@ class multiBitSet {
    *
    */
   multiBitSet() {
-    _data = nullptr;
-    _end = nullptr;
-    _size = 0;
+    data_ = nullptr;
+    end_ = nullptr;
+    size_ = 0;
   }
 
   /**
    * \brief Initialize with given size
    *
-   * \param __size The initial size.
+   * \param size__ The initial size.
    */
-  multiBitSet(size_t __size) {
-    if (__size <= 0) {
+  explicit multiBitSet(size_t size__) {
+    if (size__ <= 0) {
       return;
     }
 
     // const size_t __bytesNeed = std::ceil(float(eleBits * __size) / 8);
-    const size_t __blocksNeed = size_t(std::ceil(float(__size * eleBits) / (blockBits)));
-    _data = alloc().allocate(__blocksNeed);
-    _end = _data + __blocksNeed;
-    _size = __size;
+    const size_t __blocksNeed = size_t(std::ceil(float(size__ * eleBits) / (blockBits)));
+    data_ = alloc().allocate(__blocksNeed);
+    end_ = data_ + __blocksNeed;
+    size_ = size__;
 
-    memset(_data, 0, __blocksNeed * sizeof(block_t));
+    memset(data_, 0, __blocksNeed * sizeof(block_t));
   }
 
   /**
@@ -371,29 +371,29 @@ class multiBitSet {
    * \param b
    */
   multiBitSet(const multiBitSet& b) {
-    _data = nullptr;
-    _end = nullptr;
-    _size = 0;
+    data_ = nullptr;
+    end_ = nullptr;
+    size_ = 0;
     if (b.size() > 0) {
       this->resize(b.size());
 
-      memcpy(this->_data, b._data, b.blocks() * sizeof(block_t));
+      memcpy(this->data_, b.data_, b.blocks() * sizeof(block_t));
     }
   }
 
   /**
-   * \brief Move constructor (shallow copy)
+   * \brief Move constructor
    *
    */
-  multiBitSet(multiBitSet&& b) {
-    _data = b._data;
+  multiBitSet(multiBitSet&& b)  noexcept {
+    data_ = b.data_;
 
-    _end = b._end;
-    _size = b._size;
+    end_ = b.end_;
+    size_ = b.size_;
 
-    b._size = 0;
-    b._data = 0;
-    b.end = 0;
+    b.size_ = 0;
+    b.data_ = 0;
+    b.end_ = 0;
   }
 
   /**
@@ -401,8 +401,8 @@ class multiBitSet {
    *
    */
   ~multiBitSet() {
-    if (_data != nullptr) {
-      alloc().deallocate(_data, _end - _data);
+    if (data_ != nullptr) {
+      alloc().deallocate(data_, end_ - data_);
     }
   }
 
@@ -411,15 +411,15 @@ class multiBitSet {
    *
    * \return size_t The amount of elements.
    */
-  inline size_t size() const noexcept { return _size; }
+  [[nodiscard]] inline size_t size() const noexcept { return size_; }
 
   /**
    * \brief Get the capacity
    *
    * \return size_t The amount of elements that multiBitSet can contain without allocating memory
    */
-  inline size_t capacity() const noexcept {
-    const size_t blockNum = _end - _data;
+  [[nodiscard]] inline size_t capacity() const noexcept {
+    const size_t blockNum = end_ - data_;
     return (blockNum * sizeof(block_t) * 8) / (eleBits);
   }
 
@@ -428,14 +428,14 @@ class multiBitSet {
    *
    * \return block_t* A pointer to data
    */
-  inline block_t* data() noexcept { return _data; }
+  inline block_t* data() noexcept { return data_; }
 
   /**
    * \brief Blocks uesd to store all elements.
    *
    * \return size_t Number of blocks
    */
-  inline size_t blocks() const noexcept { return _end - _data; }
+  [[nodiscard]] inline size_t blocks() const noexcept { return end_ - data_; }
 
   inline reference_t at(size_t idx) noexcept { return this->operator[](idx); }
 
@@ -458,7 +458,7 @@ class multiBitSet {
    */
   inline void resize(size_t newSize) noexcept {
     if (newSize <= this->capacity()) {
-      _size = newSize;
+      size_ = newSize;
       return;
     }
 
@@ -468,11 +468,11 @@ class multiBitSet {
 
     // memcpy(newDataPtr, _data, _end - _data);
 
-    alloc().deallocate(_data, _end - _data);
+    alloc().deallocate(data_, end_ - data_);
 
-    _data = newDataPtr;
-    _end = _data + newBlockNum;
-    _size = newSize;
+    data_ = newDataPtr;
+    end_ = data_ + newBlockNum;
+    size_ = newSize;
   }
 
   /**
@@ -489,12 +489,12 @@ class multiBitSet {
 
     block_t* newDataPtr = alloc().allocate(newBlockNum);
 
-    memcpy(newDataPtr, _data, _end - _data);
+    memcpy(newDataPtr, data_, end_ - data_);
 
-    alloc().deallocate(_data, _end - _data);
+    alloc().deallocate(data_, end_ - data_);
 
-    _data = newDataPtr;
-    _end = _data + newBlockNum;
+    data_ = newDataPtr;
+    end_ = data_ + newBlockNum;
   }
 
   inline void shrink_to_fit() noexcept {
@@ -506,12 +506,12 @@ class multiBitSet {
 
     block_t* newData = alloc().allocate(blocksNeed);
 
-    memcpy(newData, _data, sizeof(block_t) * blocksNeed);
+    memcpy(newData, data_, sizeof(block_t) * blocksNeed);
 
-    alloc().deallocate(_data, blocks());
+    alloc().deallocate(data_, blocks());
 
-    _data = newData;
-    _end = _data + blocksNeed;
+    data_ = newData;
+    end_ = data_ + blocksNeed;
   }
 
   /**
@@ -520,7 +520,7 @@ class multiBitSet {
   inline void push_back(value_t val) noexcept {
     reserve(size() + 1);
     setValue(size(), val);
-    _size++;
+    size_++;
   }
 
   /**
@@ -533,8 +533,8 @@ class multiBitSet {
    *
    */
   inline void pop_back() noexcept {
-    assert(_size > 0);
-    _size--;
+    assert(size_ > 0);
+    size_--;
   }
 
   /**
@@ -542,13 +542,13 @@ class multiBitSet {
    *
    */
   inline void clear() noexcept {
-    if (_data != nullptr) {
-      alloc().deallocate(_data, _end - _data);
+    if (data_ != nullptr) {
+      alloc().deallocate(data_, end_ - data_);
     }
 
-    _data = nullptr;
-    _end = nullptr;
-    _size = 0;
+    data_ = nullptr;
+    end_ = nullptr;
+    size_ = 0;
   }
 
   /**
@@ -566,7 +566,7 @@ class multiBitSet {
     resize(another.size());
     const size_t blocksNeed = std::ceil(float(size() * eleBits) / blockBits);
 
-    memcpy(_data, another._data, blocksNeed * sizeof(block_t));
+    memcpy(data_, another.data_, blocksNeed * sizeof(block_t));
     return *this;
   }
 
@@ -587,9 +587,9 @@ class multiBitSet {
   inline constIterator_t end() const noexcept { return constIterator_t(this, size()); }
 
  private:
-  block_t* _data;
-  block_t* _end;
-  size_t _size;
+  block_t* data_;
+  block_t* end_;
+  size_t size_;
 
   friend class reference_t;
 
@@ -598,9 +598,9 @@ class multiBitSet {
 
     const size_t firstScalarBitIdx = eleBits * index;
     const size_t lastScalarBitIdx = (index + 1) * eleBits - 1;
-    // a element may exists in 2 blocks. Compute addresses of both blocks
-    block_t* blockPrevPtr = _data + firstScalarBitIdx / blockBits;
-    block_t* blockNextPtr = _data + lastScalarBitIdx / blockBits;
+    // an element may exist in 2 blocks. Compute addresses of both blocks
+    block_t* blockPrevPtr = data_ + firstScalarBitIdx / blockBits;
+    block_t* blockNextPtr = data_ + lastScalarBitIdx / blockBits;
 
     // if pointers are the same, the element is in a single block
     if (blockPrevPtr == blockNextPtr) {
@@ -635,8 +635,8 @@ class multiBitSet {
     const size_t firstScalarBitIdx = eleBits * index;
     const size_t lastScalarBitIdx = (index + 1) * eleBits - 1;
 
-    const block_t* blockPrevPtr = _data + firstScalarBitIdx / blockBits;
-    const block_t* blockNextPtr = _data + lastScalarBitIdx / blockBits;
+    const block_t* blockPrevPtr = data_ + firstScalarBitIdx / blockBits;
+    const block_t* blockNextPtr = data_ + lastScalarBitIdx / blockBits;
 
     if (blockPrevPtr != blockNextPtr) {
       const size_t midBitIdx = (lastScalarBitIdx / blockBits) * blockBits;
