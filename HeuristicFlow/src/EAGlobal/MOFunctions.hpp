@@ -261,29 +261,23 @@ struct MOFunctionsX2<Var_t, Fitness_t, void> {
         auto topN_sub_1Rows = _x->template topRows<N - 1>();
         auto bottomN_sub_1Rows = _x->template bottomRows<N - 1>();
         f1 = -10 * (-0.2 *
-
                     (topN_sub_1Rows.array().square() + bottomN_sub_1Rows.array().square())
-
                         .sqrt())
                        .exp()
                        .sum();
 
       } else {
-        auto topN_sub_1Rows = _x->template topRows(N - 1);
-        auto bottomN_sub_1Rows = _x->template bottomRows(N - 1);
+        auto topN_sub_1Rows = _x->topRows(N - 1);
+        auto bottomN_sub_1Rows = _x->bottomRows(N - 1);
         f1 = -10 * (-0.2 *
-
                     (topN_sub_1Rows.array().square() + bottomN_sub_1Rows.array().square())
-
                         .sqrt())
                        .exp()
                        .sum();
       }
 
       f2 = (_x->array().abs().pow(0.8)
-
             + 5 * (_x->array().cube()).sin()
-
                 )
                .sum();
     } else {

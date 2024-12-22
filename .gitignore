@@ -94,3 +94,5 @@ compile-commands.json
 # clion generated
 cmake-build*
 .idea/*
+
+build/*
